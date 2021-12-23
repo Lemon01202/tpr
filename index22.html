@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div>
+    1<input id="11" value="1" /><input id="21" value="5" /><br />
+    2<input id="12" value="2" /><input id="22" value="4" /><br />
+    3<input id="13" value="3" /><input id="23" value="3" /><br />
+    4<input id="14" value="4" /><input id="24" value="2" /><br />
+    5<input id="15" value="5" /><input id="25" value="1" /><br /><br />
+  </div>
+  <select id="selector">
+    <option value="1">No randomize MinMax</option>
+    <option value="2">No randomize Naimon Pirson</option>
+    <option value="3">Randomize MinMax</option>
+    <option value="4">Randomize Naimon Pirson</option>
+  </select>
+  <button onclick="foo()">Calculate</button>
+  <br /><br />
+  <input id="answer" />
+  <script>
+    // My
+    const runPokemonMiniMax = (L) => {
+      const Max = L.map((l) => (l[0] > l[1] ? l[0] : l[1]));
+      return Max.reduce((min, max, index) => (min < max ? { ...min } : { Min: max, index }), {
+        Min: Max[0],
+        index: 0
+      }).index + 1;
+    };
+
+    const runPokemonNeimonaPirsona = (L) => {
+      const wingsStrategies = L.filter((l) => l[0] >= l[1]);
+      const winner = wingsStrategies.reduce((saved, current) => (saved[0] - saved[1]) < (current[0] - current[1]) ? saved : current, wingsStrategies[0]);
+      return L.reduce((saved, l, index) => (l[0] === saved.winner[0] && l[0] === saved.winner[0]) ? {
+        winner: l,
+        index
+      } : { ...saved }, { winner, index: 0 }).index + 1;
+    };
+
+    // Alex
+    const randomizeMinMax = (arr) => {
+      const arr2 = arr.map(s => s.map(d => +d));
+      const rowSum = arr2.map(r => r.reduce((a, b) => a + b));
+      let ans1 = -Infinity;
+      let ans2 = -Infinity;
+      let b1, b2;
+      let i;
+      for (i = 0; i < rowSum.length; i++) {
+        if (rowSum[i] >= ans1) {
+          ans1 = rowSum[i];
+          b1 = i;
+        }
+      }
+      rowSum[b1] = -Infinity;
+      for (i = 0; i < rowSum.length; i++) {
+        if (rowSum[i] >= ans2) {
+          ans2 = rowSum[i];
+          b2 = i;
+        }
+      }
+      console.log([b1, b2], rowSum);
+      const firstStrategy = (arr[b2][0] + arr[b2][1] - (arr[b1][0] + arr[b1][1])) / (arr[b2][0] + arr[b2][1]);
+      const secondStrategy = 1 - firstStrategy;
+      return firstStrategy > secondStrategy ? b2+1 : b1+1;
+    };
+
+    const randomizeNeiman = (arr, l) => {
+      const firstStrategy = ((l - arr[arr.length - 1][1]) / (arr[0][1] - arr[arr.length - 1][1]));
+      const secondStrategy = 1 - firstStrategy;
+      return arr.reduce((saved, l, index) => (l[0] === saved.secondStrategy[0] && l[0] === saved.secondStrategy[0]) ? {
+        secondStrategy: l,
+        index
+      } : { ...saved }, { secondStrategy, index: 0 }).index + 1;
+    };
+    const foo = () => {
+      const n = Number(document.getElementById("selector").value);
+      const L = [
+        [document.getElementById("11").value, document.getElementById("21").value],
+        [document.getElementById("12").value, document.getElementById("22").value],
+        [document.getElementById("13").value, document.getElementById("23").value],
+        [document.getElementById("14").value, document.getElementById("24").value],
+        [document.getElementById("15").value, document.getElementById("25").value]
+      ];
+      const neiman = document.getElementById("neiman");
+      const minimax = document.getElementById('minimax');
+      switch (n) {
+        case 1:
+          document.getElementById("answer").value = (runPokemonMiniMax(L));
+          neiman.hidden = true;
+          minimax.hidden = false;
+          break;
+        case 2:
+          document.getElementById("answer").value = (runPokemonNeimonaPirsona(L));
+          neiman.hidden = false;
+          minimax.hidden = true;
+          break;
+        case 3:
+          document.getElementById("answer").value = (randomizeMinMax(L));
+          neiman.hidden = true;
+          minimax.hidden = false;
+          break;
+        case 4:
+          document.getElementById("answer").value = (randomizeNeiman(L, Math.random() * 10));
+          neiman.hidden = false;
+          minimax.hidden = true;
+          break;
+      }
+    };
+  </script>
+  <div>
+    <h2>--</h2>
+    <div>
+      Рандомізованим розв’язком називається розподіл імовірностей на мно-жині нерандомізованих розв’язків.
+      Нерандомізованим розв’язком називається будь-яка ai стратегія особи, яка приймає рішення.</div>
+  </div>
+
+  <div id='minimax' hidden>
+    <h2>Мінімаксний критерій оптимальності</h2>
+    <div>1. Мінімаксний критерій оптимальності відображує психологію песиміста. Пе-симістично налаштована особа вибирає
+      свою оптимальну стратегію , очікуючи, що її втрати будуть максимальні.
+      <br />
+      2.Щоб знайти рандомізований розв’язок за мінімаксним кри-терієм, необхідно рухати прямокутний клин по бісектрисі
+      першої чверті коорди-натної площини () до першого перетину із платіжною множиною. Одержа-на точка і буде
+      розв’язком
+    </div>
+  </div>
+
+  <div id='neiman' hidden>
+    <h2>Критерій оптимальності Неймана-Пірсона</h2>
+    <div>
+      1. Критерій оптимальності Неймана-Пірсона застосовується тоді, коли природа може знаходитися у двох станах,
+      один із яких можна контролювати, а інший – ні.
+      Для стану, який ми можемо контролювати, вводиться граничне значення і всі допустимі розв’язки, які для цього стану
+      призводять до втрат, більших за гра-ничне значення, виключаються з розгляду.
+      Згідно з критерієм Неймана – Пірсона із двох розв’язків кращим є той, для якого втрати для стану, що не
+      контролюється, менші.
+      <br />
+
+      2. Критерій оптимальності Неймана-Пірсона застосовується тоді, коли природа може знаходиться у двох станах, один
+      із яких можна контролювати, а інший – ні.
+      Для стану, який ми можемо контролювати, вводиться граничне значення , і всі допустимі розв’язки, які для цього
+      стану призводять до втрат, більших за граничне значення, виключаються з розгляду.
+      У геометричній інтерпретації із платіжної множини виключаються всі розв’язки для яких значення за станом, що
+      контролюється, більші за граничне зна-чення.
+      З усіх інших точок множини вибирають ту, для якої значення за станом, що не контролюється, найменше.
+    </div>
+  </div>
+</body>
+
+</html>
